@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Finder - Social Pill</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a0b3d;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a0b3d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '🔍';
+            font-size: 1.8rem;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 2rem 4rem;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Background Pattern */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            right: -10%;
+            width: 60%;
+            height: 100%;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .pill {
+            position: absolute;
+            border-radius: 50px;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .pill:nth-child(1) { background: #4FC3F7; width: 80px; height: 200px; top: 10%; left: 10%; animation-delay: 0s; }
+        .pill:nth-child(2) { background: #F06292; width: 60px; height: 150px; top: 20%; left: 60%; animation-delay: 2s; }
+        .pill:nth-child(3) { background: #FFD54F; width: 70px; height: 180px; top: 50%; left: 80%; animation-delay: 4s; }
+        .pill:nth-child(4) { background: #81C784; width: 50px; height: 140px; top: 70%; left: 20%; animation-delay: 6s; }
+        .pill:nth-child(5) { background: #BA68C8; width: 60px; height: 160px; top: 80%; left: 50%; animation-delay: 8s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(10deg); }
+            66% { transform: translateY(10px) rotate(-10deg); }
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: #FFD54F;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: #E1BEE7;
+            margin-bottom: 2rem;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            color: #FFD54F;
+            font-weight: 500;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #FFD54F;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 221, 79, 0.3);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Profile Count Dropdown */
+        .dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-select {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+            padding-right: 3rem;
+        }
+
+        .dropdown-select:focus {
+            outline: none;
+            border-color: #FFD54F;
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 221, 79, 0.3);
+        }
+
+        .dropdown-select:hover {
+            border-color: #FFD54F;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .dropdown-select option {
+            background: #1a0b3d;
+            color: #fff;
+            padding: 0.5rem;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(45deg, #F06292, #EC407A);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(240, 98, 146, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn.loading {
+            background: linear-gradient(45deg, #9E9E9E, #757575);
+            cursor: not-allowed;
+        }
+
+        /* Results Section */
+        .results-section {
+            margin-top: 3rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(129, 199, 132, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .results-title {
+            font-size: 2.5rem;
+            color: #FFD54F;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .results-title::before {
+            content: '🎉';
+            font-size: 2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .download-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .download-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #81C784, #66BB6A);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(129, 199, 132, 0.4);
+        }
+
+        .download-btn.secondary {
+            background: linear-gradient(45deg, #4FC3F7, #29B6F6);
+        }
+
+        .download-btn.secondary:hover {
+            box-shadow: 0 10px 30px rgba(79, 195, 247, 0.4);
+        }
+
+        .download-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .download-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Results Stats */
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FFD54F;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Search Criteria Display */
+        .criteria-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #FFD54F;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .criteria-label {
+            font-size: 0.9rem;
+            color: #FFD54F;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .criteria-text {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Success Animation */
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            animation: successPop 1s ease-out;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes successPop {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.5); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.2); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(1); 
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .status-success {
+            background: rgba(129, 199, 132, 0.2);
+            border: 1px solid rgba(129, 199, 132, 0.5);
+            color: #81C784;
+        }
+
+        .status-error {
+            background: rgba(239, 83, 80, 0.2);
+            border: 1px solid rgba(239, 83, 80, 0.5);
+            color: #EF5350;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .form-container {
+                padding: 2rem;
+            }
+            
+            .profile-selector {
+                flex-direction: column;
+            }
+            
+            .profile-option {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Pattern -->
+    <div class="bg-pattern">
+        <div class="pill"></div>
+        <div class="pill"></div>
+        <div class="pill"></div>
+        <div class="pill"></div>
+        <div class="pill"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">Profile Finder</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Find Your Perfect Profiles</h1>
+            <p>Connect with professionals that match your criteria</p>
+        </div>
+
+        <!-- Form -->
+        <div class="form-container">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="criteria">Search Criteria</label>
+                    <textarea 
+                        id="criteria" 
+                        name="criteria" 
+                        placeholder="e.g., Social media head with 3-4 years experience based in Mumbai"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="profileCount">Max Profiles to Find</label>
+                    <div class="dropdown-container">
+                        <select id="profileCount" name="profileCount" class="dropdown-select" required>
+                            <option value="">Select number of profiles</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            <option value="60">60</option>
+                            <option value="70">70</option>
+                            <option value="80">80</option>
+                            <option value="90">90</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Find Profiles
+                </button>
+            </form>
+
+            <div id="statusMessage"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-container">
+                <div class="results-header">
+                    <h2 class="results-title">Your Results</h2>
+                    <div class="download-options">
+                        <button class="download-btn" id="downloadBtn">
+                            <span>📊</span> View Spreadsheet
+                        </button>
+                        <button class="download-btn secondary" id="downloadCsvBtn">
+                            <span>📥</span> Download CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results-stats" id="resultsStats">
+                    <div class="stat-card">
+                        <span class="stat-icon">👥</span>
+                        <div class="stat-value" id="profileCountStat">0</div>
+                        <div class="stat-label">Profiles Found</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">✨</span>
+                        <div class="stat-value">100%</div>
+                        <div class="stat-label">Match Quality</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">⚡</span>
+                        <div class="stat-value" id="processingTime">0s</div>
+                        <div class="stat-label">Processing Time</div>
+                    </div>
+                </div>
+
+                <div class="criteria-display" id="criteriaDisplay">
+                    <div class="criteria-label">Your Search Criteria</div>
+                    <div class="criteria-text" id="criteriaText"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="window.location.reload()">
+                        <span>🔄</span> New Search
+                    </button>
+                    <button class="action-btn" id="shareBtn">
+                        <span>📤</span> Share Results
+                    </button>
+                    <button class="action-btn" id="saveBtn">
+                        <span>💾</span> Save Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const N8N_WEBHOOK_URL = 'https://socialpillai.com/webhook/541bdd9b-5022-4e42-954c-5f04aa5dc3cb'; // Your n8n webhook URL
+
+        // Form elements
+        const form = document.getElementById('profileForm');
+        const criteriaInput = document.getElementById('criteria');
+        const profileCountSelect = document.getElementById('profileCount');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        
+        let currentResults = null;
+        let searchStartTime = null;
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedCount = parseInt(profileCountSelect.value);
+            
+            if (!selectedCount) {
+                showStatus('Please select the number of profiles', 'error');
+                return;
+            }
+
+            const criteria = criteriaInput.value.trim();
+            if (!criteria) {
+                showStatus('Please enter search criteria', 'error');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.innerHTML = '<span class="spinner"></span> Finding profiles...';
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            statusMessage.innerHTML = '';
+            resultsSection.style.display = 'none';
+            searchStartTime = Date.now();
+
+            try {
+                // Send request to n8n webhook
+                console.log('Sending request to:', N8N_WEBHOOK_URL);
+                console.log('Request data:', { criteria, profileCount: selectedCount });
+                
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        criteria: criteria,
+                        profileCount: selectedCount
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch profiles: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                currentResults = data;
+
+                // Show results
+                showResults(data, selectedCount);
+                showStatus('Profiles found successfully!', 'success');
+
+            } catch (error) {
+                console.error('Error details:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = 'Find Profiles';
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Show results
+        function showResults(data, count) {
+            console.log('showResults called with:', data);
+            
+            // Calculate processing time
+            const processingTime = ((Date.now() - searchStartTime) / 1000).toFixed(1);
+            
+            // Show success animation
+            const successEmoji = document.createElement('div');
+            successEmoji.className = 'success-animation';
+            successEmoji.textContent = '✅';
+            document.body.appendChild(successEmoji);
+            setTimeout(() => successEmoji.remove(), 1000);
+            
+            // Display results section
+            resultsSection.style.display = 'block';
+            
+            // Store the data properly
+            if (data && (data.downloadUrl || data[0]?.downloadUrl)) {
+                // Handle both single object and array responses
+                currentResults = data[0] || data;
+                console.log('Stored currentResults:', currentResults);
+            }
+            
+            // Update stats
+            document.getElementById('profileCountStat').textContent = count;
+            document.getElementById('processingTime').textContent = `${processingTime}s`;
+            
+            // Display search criteria
+            document.getElementById('criteriaText').textContent = criteriaInput.value;
+            
+            // Animate stats
+            animateStats();
+            
+            // Scroll to results
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        // Animate statistics
+        function animateStats() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.animation = 'bounceIn 0.5s ease';
+                }, index * 100);
+            });
+        }
+
+        // Add bounceIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounceIn {
+                0% { opacity: 0; transform: scale(0.3); }
+                50% { opacity: 1; transform: scale(1.05); }
+                70% { transform: scale(0.95); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Download functionality
+        downloadBtn.addEventListener('click', () => {
+            console.log('Download clicked, currentResults:', currentResults);
+            
+            if (!currentResults) {
+                showStatus('No results available to download', 'error');
+                return;
+            }
+
+            // Try different possible response structures
+            const downloadUrl = currentResults.downloadUrl || 
+                               currentResults.url || 
+                               currentResults.spreadsheetUrl ||
+                               (currentResults[0] && currentResults[0].downloadUrl);
+            
+            console.log('Download URL:', downloadUrl);
+            
+            if (!downloadUrl) {
+                showStatus('Download URL not found in response', 'error');
+                console.error('Current results structure:', currentResults);
+                return;
+            }
+            
+            // Open the spreadsheet in a new tab
+            window.open(downloadUrl, '_blank');
+            
+            showStatus('Opening spreadsheet...', 'success');
+        });
+
+        // CSV Download
+        downloadCsvBtn.addEventListener('click', () => {
+            if (!currentResults) {
+                showStatus('No results available to download', 'error');
+                return;
+            }
+
+            const downloadUrl = currentResults.downloadUrl || 
+                               currentResults.url || 
+                               currentResults.spreadsheetUrl ||
+                               (currentResults[0] && currentResults[0].downloadUrl);
+
+            if (!downloadUrl) {
+                showStatus('Download URL not found', 'error');
+                return;
+            }
+
+            // Convert to CSV export URL
+            const csvUrl = currentResults.csvDownloadUrl || 
+                          downloadUrl.replace('/edit', '/export?format=csv');
+            
+            window.open(csvUrl, '_blank');
+            showStatus('Downloading CSV...', 'success');
+        });
+
+        // Share functionality
+        shareBtn.addEventListener('click', async () => {
+            const shareData = {
+                title: 'Profile Search Results',
+                text: `Found ${currentResults?.profileCount || 'multiple'} profiles matching: ${criteriaInput.value}`,
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback: copy to clipboard
+                    navigator.clipboard.writeText(shareData.url);
+                    showStatus('Link copied to clipboard!', 'success');
+                }
+            } catch (err) {
+                showStatus('Could not share results', 'error');
+            }
+        });
+
+        // Save search
+        saveBtn.addEventListener('click', () => {
+            const searchData = {
+                criteria: criteriaInput.value,
+                profileCount: profileCountSelect.value,
+                date: new Date().toISOString(),
+                resultsUrl: currentResults?.downloadUrl
+            };
+
+            // Save to localStorage
+            const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+            savedSearches.push(searchData);
+            localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
+
+            showStatus('Search saved successfully!', 'success');
+            
+            // Visual feedback
+            saveBtn.innerHTML = '<span>✅</span> Saved!';
+            setTimeout(() => {
+                saveBtn.innerHTML = '<span>💾</span> Save Search';
+            }, 2000);
+        });
+
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.innerHTML = `
+                <div class="status-message status-${type}">
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Alternative: Create and download CSV from data
+        function downloadCSV(profiles) {
+            // Convert profiles array to CSV
+            const headers = Object.keys(profiles[0]).join(',');
+            const rows = profiles.map(profile => 
+                Object.values(profile).map(value => 
+                    `"${String(value).replace(/"/g, '""')}"`
+                ).join(',')
+            );
+            
+            const csv = [headers, ...rows].join('\n');
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `profiles_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-resize textarea
+            criteriaInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>
